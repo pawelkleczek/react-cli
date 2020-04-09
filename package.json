@@ -1,6 +1,6 @@
 {
   "name": "@pawelkleczek/react-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI to build react components",
   "main": "src/index.js",
   "author": {
@@ -39,6 +39,10 @@
     "minimist": "^1.2.5",
     "ncp": "^2.0.0",
     "pkg-install": "^1.0.0",
+    "replace-in-file": "^5.0.2",
     "touch": "^3.1.0"
+  },
+  "devDependencies": {
+    "react": "^16.13.1"
   }
 }

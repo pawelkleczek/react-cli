@@ -5,34 +5,26 @@ import { createProject } from './main';
 function parseArgumentsIntoOptions(rawArgs) {
   const args = arg(
     {
-      '--git': Boolean,
-      '--yes': Boolean,
-      '--install': Boolean,
-      '-g': '--git',
-      '-y': '--yes',
-      '-i': '--install',
+      '--name': String,
+      '--type': String,
+      '--template': String,
+      '-n': '--name',
+      '-t': '--type',
+      '-p': '--template'
     },
     {
       argv: rawArgs.slice(2),
     }
   );
   return {
-    skipPrompts: args['--yes'] || false,
-    git: args['--git'] || false,
-    template: args._[0],
-    runInstall: args['--install'] || false,
+    name: args['--name'],
+    type: args['--type'],
+    template: args['--template'],
   };
 }
 
 async function promptForMissingOptions(options) {
   const defaultTemplate = 'JavaScript';
-  if (options.skipPrompts) {
-    return {
-      ...options,
-      template: options.template || defaultTemplate,
-    };
-  }
-
   const questions = [];
   if (!options.template) {
     questions.push({
@@ -44,20 +36,35 @@ async function promptForMissingOptions(options) {
     });
   }
 
-  if (!options.git) {
+  if (!options.type) {
     questions.push({
-      type: 'confirm',
-      name: 'git',
-      message: 'Initialize a git repository?',
-      default: false,
+      type: 'list',
+      name: 'type',
+      message: 'Select type of component',
+      choices: ['View', 'Component']
+    });
+  }
+
+  if (!options.name) {
+    questions.push({
+      type: 'input',
+      name: 'name',
+      message: 'Chooes name for a component.',
+      validate: function( value ) {
+        if (value.length) {
+          return true;
+        } else {
+          return 'Please enter name.';
+        }
+      }
     });
   }
 
   const answers = await inquirer.prompt(questions);
   return {
-    ...options,
     template: options.template || answers.template,
-    git: options.git || answers.git,
+    name: options.name || answers.name,
+    type: options.type || answers.type
   };
  }
 
