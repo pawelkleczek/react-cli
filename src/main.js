@@ -21,39 +21,41 @@ async function createDirectory(options) {
     cwd: options.targetDirectory,
   });
   if (result.failed) {
-    return Promise.reject(new Error('Failed to initialize git'));
+    return Promise.reject(new Error('Failed to create directory'));
   }
   return;
 }
 
 async function adjustFileNames(options) {
   const fileExt = options.template === 'JavaScript' ? 'js' : 'tsx'
-  const resultOne = await execa('mv', [`Component.${fileExt}`, `${options.name}.${fileExt}`], {
+  const viewPart = options.type === 'View' ? 'View' : '';
+  const resultOne = await execa('mv', [`Component.${fileExt}`, `${options.name}${viewPart}.${fileExt}`], {
     cwd: path.join(options.targetDirectory, options.name),
   });
-  const resultTwo = await execa('mv', ['Component.module.scss', `${options.name}.module.scss`], {
+  const resultTwo = await execa('mv', ['Component.module.scss', `${options.name}${viewPart}.module.scss`], {
     cwd: path.join(options.targetDirectory, options.name),
   });
   if (resultOne.failed || resultTwo.failed) {
-    return Promise.reject(new Error('Failed to initialize git'));
+    return Promise.reject(new Error('Failed to adjust file names.'));
   }
   return;
 }
 
 async function adjustNamesInFiles(options) {
   const fileExt = options.template === 'JavaScript' ? 'js' : 'ts'
+  const viewPart = options.type === 'View' ? 'View' : '';
   const x = fileExt === 'ts' ? 'x' : '';
   try {
     await replace({
       files: [
-        path.join(options.targetDirectory, options.name, `${options.name}.${fileExt}${x}`),
+        path.join(options.targetDirectory, options.name, `${options.name}${viewPart}.${fileExt}${x}`),
         path.join(options.targetDirectory, options.name, `index.${fileExt}`),
       ],
       from: /Component/g,
-      to: options.name
+      to: `${options.name}${viewPart}`
     })
   } catch (error) {
-    return Promise.reject(new Error('Failed to initialize git'));
+    return Promise.reject(new Error('Failed to adjust names in files.'));
   }
   return;
 }
